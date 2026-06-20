@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from datetime import timedelta
 
@@ -42,18 +43,19 @@ class SenzWiFiCoordinator(DataUpdateCoordinator[ThermostatsResponse]):
         self.api = api
 
     @classmethod
-    def create_and_setup(
+    async def create_and_setup(
         cls,
         hass: HomeAssistant,
         config_entry: ConfigEntry,
     ) -> SenzWiFiCoordinator:
-        """Create the coordinator and authenticate."""
+        """Create the coordinator."""
         api = AsyncSenzWifi(
             email=config_entry.data[CONF_EMAIL],
             password=config_entry.data[CONF_PASSWORD],
             max_retries=DEFAULT_MAX_RETRIES,
             timeout=DEFAULT_TIMEOUT,
         )
+
         coordinator = cls(hass, config_entry, api)
         return coordinator
 

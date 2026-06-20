@@ -30,8 +30,22 @@
       "reauth_successful": "Re-authentication was successful"
     }
   },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Senz WiFi - Heating Power Configuration",
+        "description": "Configure the heating power (in watts) for each thermostat. This is used to calculate energy consumption when heating is active.",
+        "data": {
+          "heating_power_watts": "Heating power (W)"
+        }
+      }
+    }
+  },
   "entity": {
     "sensor": {
+      "current_temperature": {
+        "name": "Current temperature"
+      },
       "comfort_temperature": {
         "name": "Comfort temperature"
       },
@@ -58,6 +72,12 @@
       },
       "selected_schedule": {
         "name": "Selected schedule"
+      },
+      "power": {
+        "name": "Power"
+      },
+      "energy": {
+        "name": "Energy"
       }
     },
     "binary_sensor": {
@@ -85,6 +105,11 @@
       },
       "schedule_select": {
         "name": "Schedule"
+      }
+    },
+    "number": {
+      "heating_power_watts": {
+        "name": "Heating power"
       }
     }
   },

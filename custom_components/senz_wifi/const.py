@@ -34,6 +34,7 @@ SUFFIX_SELECTED_SCHEDULE = "selected_schedule"
 
 SUFFIX_ONLINE = "online"
 SUFFIX_HEATING = "heating"
+SUFFIX_CURRENT_TEMPERATURE = "current_temperature"
 
 SUFFIX_VACATION_MODE = "vacation_mode"
 SUFFIX_FROST_PROTECTION = "frost_protection"
@@ -41,6 +42,14 @@ SUFFIX_EARLY_START = "early_start"
 
 SUFFIX_REGULATION_MODE = "regulation_mode"
 SUFFIX_SCHEDULE_SELECT = "schedule_select"
+
+SUFFIX_POWER = "power"
+SUFFIX_ENERGY = "energy"
+SUFFIX_HEATING_POWER_WATTS = "heating_power_watts"
+
+# Configuration for heating power (watts)
+CONF_HEATING_POWER_WATTS = "heating_power_watts"
+DEFAULT_HEATING_POWER_WATTS = 1000  # 1000W default
 
 
 class SenzHVACMode(StrEnum):

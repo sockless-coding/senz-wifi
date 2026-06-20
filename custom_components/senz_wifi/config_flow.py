@@ -14,7 +14,11 @@ from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 
-from .const import DOMAIN
+from .const import (
+    CONF_HEATING_POWER_WATTS,
+    DEFAULT_HEATING_POWER_WATTS,
+    DOMAIN,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -151,3 +155,63 @@ class CannotConnect(HomeAssistantError):
 
 class InvalidAuth(HomeAssistantError):
     """Error to indicate there is invalid auth."""
+
+
+class SenzWiFiOptionsFlowHandler(ConfigFlow, domain=DOMAIN):
+    """Handle options flow for Senz WiFi."""
+
+    def __init__(self) -> None:
+        """Initialize the options flow handler."""
+        self._thermostat_info: dict[str, str] = {}
+
+    async def async_step_init(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> ConfigFlowResult:
+        """Handle the options flow step."""
+        errors: dict[str, str] = {}
+
+        entry = self._get_current_entry()
+
+        # Get thermostat info from runtime data
+        coordinator = entry.runtime_data
+        if coordinator and coordinator.data:
+            all_thermostats = coordinator.data.get_all_thermostats()
+            self._thermostat_info = {
+                t.serial_number: t.room for t in all_thermostats
+            }
+
+        if not self._thermostat_info:
+            return self.async_abort(reason="no_thermostats")
+
+        # Build schema with heating power for each thermostat, using room names
+        schema = {}
+        for serial, room in self._thermostat_info.items():
+            key = f"{serial}_{CONF_HEATING_POWER_WATTS}"
+            schema[
+                vol.Optional(
+                    key,
+                    default=entry.options.get(
+                        key,
+                        DEFAULT_HEATING_POWER_WATTS,
+                    ),
+                )
+            ] = vol.All(vol.Coerce(int), vol.Range(min=100, max=10000))
+
+        if user_input is not None:
+            # Preserve existing options and update with new values
+            current_options = dict(entry.options)
+            current_options.update(user_input)
+            return self.async_create_entry(title="", data=current_options)
+
+        return self.async_show_form(
+            step_id="init",
+            data_schema=vol.Schema(schema),
+            errors=errors,
+            description_placeholders={
+                "thermostats": ", ".join(
+                    f"{room} ({serial})"
+                    for serial, room in self._thermostat_info.items()
+                ),
+            },
+        )

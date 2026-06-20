@@ -18,7 +18,9 @@ from homeassistant.helpers.entity_registry import async_get as async_get_entity_
 
 from .const import (
     CONF_DURATION_MINUTES,
+    CONF_HEATING_POWER_WATTS,
     DEFAULT_BOOST_DURATION_MINUTES,
+    DEFAULT_HEATING_POWER_WATTS,
     DOMAIN,
     SERVICE_BOOST,
 )
@@ -29,6 +31,7 @@ _LOGGER = logging.getLogger(__name__)
 PLATFORMS: list[Platform] = [
     Platform.BINARY_SENSOR,
     Platform.CLIMATE,
+    Platform.NUMBER,
     Platform.SELECT,
     Platform.SENSOR,
     Platform.SWITCH,
@@ -51,7 +54,7 @@ async def async_setup_entry(
     entry: SenzWiFiConfigEntry,
 ) -> bool:
     """Set up Senz WiFi from a config entry."""
-    coordinator = SenzWiFiCoordinator.create_and_setup(hass, entry)
+    coordinator = await SenzWiFiCoordinator.create_and_setup(hass, entry)
 
     try:
         await coordinator.async_config_entry_first_refresh()
@@ -61,6 +64,26 @@ async def async_setup_entry(
         raise
 
     entry.runtime_data = coordinator
+
+    # Store serial numbers in options for the options flow
+    thermostats_response = coordinator.data
+    all_thermostats = thermostats_response.get_all_thermostats()
+    serial_numbers = [t.serial_number for t in all_thermostats]
+
+    current_options = dict(entry.options)
+    current_options["serial_numbers"] = serial_numbers
+
+    # Set default heating power for each thermostat if not already set
+    for serial in serial_numbers:
+        key = f"{serial}_{CONF_HEATING_POWER_WATTS}"
+        if key not in current_options:
+            current_options[key] = DEFAULT_HEATING_POWER_WATTS
+
+    if current_options != entry.options:
+        hass.config_entries.async_update_entry(
+            entry,
+            options=current_options,
+        )
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
@@ -110,6 +133,16 @@ async def async_setup_entry(
     return True
 
 
+async def async_options_flow(
+    hass: HomeAssistant,
+    entry: SenzWiFiConfigEntry,
+):
+    """Handle options flow."""
+    from .config_flow import SenzWiFiOptionsFlowHandler
+
+    return SenzWiFiOptionsFlowHandler()
+
+
 async def async_unload_entry(
     hass: HomeAssistant,
     entry: SenzWiFiConfigEntry,
@@ -118,7 +151,5 @@ async def async_unload_entry(
     if unload_ok := await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
         await entry.runtime_data.async_shutdown()
         hass.services.async_remove(DOMAIN, SERVICE_BOOST)
-
-    return unload_ok
 
     return unload_ok
