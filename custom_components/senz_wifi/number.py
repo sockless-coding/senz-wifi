@@ -30,6 +30,7 @@ HEATING_POWER_NUMBER_DESCRIPTION = NumberEntityDescription(
     native_max_value=10000,
     native_step=50,
     native_unit_of_measurement=UnitOfPower.WATT,
+    mode="box",
 )
 
 
