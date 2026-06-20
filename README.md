@@ -9,15 +9,18 @@ A [Home Assistant](https://www.home-assistant.io/) custom integration for [Senz 
 - **Climate entity** per thermostat with full control:
   - HVAC modes: Auto (schedule), Heat (manual), Off
   - Preset modes: Boost
-  - Temperature setting with min/max clamping
+  - Temperature setting with min/max clamping (0.5 °C step)
   - Current temperature, target temperature, and HVAC action reporting
 - **Sensor entities** per thermostat:
+  - Current temperature
   - Comfort temperature
   - Vacation temperature
   - Frost temperature
   - Boost floor temperature
   - Boost room temperature
   - Boost end time (timestamp)
+  - Power — current heating power consumption (in watts)
+  - Energy — cumulative energy consumption (in kWh)
   - Error code (diagnostic)
   - Software version (diagnostic)
   - Selected schedule (diagnostic)
@@ -31,9 +34,12 @@ A [Home Assistant](https://www.home-assistant.io/) custom integration for [Senz 
 - **Select entities** per thermostat:
   - Regulation mode (Schedule / Boost / Manual / Off)
   - Schedule selection (from available schedules)
-- **Boost service** — start boost/comfort mode with configurable duration
+- **Number entities** per thermostat:
+  - Heating power — configurable wattage used for power/energy calculations (100–10 000 W, default 1000 W)
+- **Boost service** — start boost/comfort mode with configurable duration (1–1440 minutes)
 - **Diagnostics** — download config entry diagnostics (credentials redacted)
 - **Re-authentication flow** — automatically prompts for new credentials if the session expires
+- **Options flow** — configure heating power per thermostat from the integration settings
 
 ## Installation
 
@@ -65,12 +71,15 @@ Each thermostat is created as a device with the following entities:
 | Entity | Domain | Description |
 |--------|--------|-------------|
 | `{room}` | `climate` | Main thermostat control |
+| Current temperature | `sensor` | Current room temperature |
 | Comfort temperature | `sensor` | Comfort/boost temperature setpoint |
 | Vacation temperature | `sensor` | Vacation mode temperature |
 | Frost temperature | `sensor` | Frost protection temperature |
 | Boost floor temperature | `sensor` | Boost floor temperature setpoint |
 | Boost room temperature | `sensor` | Boost room temperature setpoint |
 | Boost end time | `sensor` | When the current boost will end |
+| Power | `sensor` | Current heating power consumption (W) |
+| Energy | `sensor` | Cumulative energy consumption (kWh) |
 | Error code | `sensor` | Device error code (0 = no error) |
 | Software version | `sensor` | Thermostat firmware version |
 | Selected schedule | `sensor` | Currently active schedule number |
@@ -81,6 +90,7 @@ Each thermostat is created as a device with the following entities:
 | Early start | `switch` | Toggle early start of heating |
 | Regulation mode | `select` | Set regulation mode (Schedule/Boost/Manual/Off) |
 | Schedule | `select` | Select active schedule |
+| Heating power | `number` | Configurable heating power in watts (100–10 000 W) |
 
 ## Services
 
@@ -111,16 +121,33 @@ automation:
           duration_minutes: 120
 ```
 
+## Power & Energy Monitoring
+
+Each thermostat includes **Power** and **Energy** sensors that estimate heating consumption:
+
+- **Power** — reports the configured heating power (in watts) when heating is active, and 0 W when idle.
+- **Energy** — accumulates energy consumption (in kWh) based on the power sensor and heating state.
+
+The heating power is configurable per thermostat via the **Heating power** number entity (100–10 000 W, default 1000 W). You can also configure it through the integration's options flow:
+
+1. Go to **Settings → Devices & Services**
+2. Find the **Senz WiFi** integration
+3. Click **Options**
+4. Set the heating power for each thermostat
+
+> **Tip**: Set the heating power to match your actual underfloor heating circuit wattage for accurate energy tracking.
+
 ## Requirements
 
 - Home Assistant 2024.1.0 or later
-- `senzwifi` Python package (installed automatically)
+- `senzwifi>=2026.6.1` Python package (installed automatically)
 
 ## Troubleshooting
 
 - **Authentication errors**: If your credentials are no longer valid, the integration will prompt you to re-authenticate via the config flow.
 - **No entities created**: Ensure your thermostats are online and accessible via the Senz WiFi API.
 - **Slow updates**: The integration polls the cloud API every 30 seconds. This is the expected behavior for a cloud-based integration.
+- **Inaccurate power/energy readings**: Adjust the **Heating power** setting to match your actual heating circuit wattage. The default is 1000 W.
 
 ## License
 
