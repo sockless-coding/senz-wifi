@@ -1,0 +1,107 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Senz WiFi - Enter Credentials",
+        "data": {
+          "email": "[%key:common::config_flow::data::email%]",
+          "password": "[%key:common::config_flow::data::password%]"
+        },
+        "data_description": {
+          "email": "Email address for your Senz WiFi account",
+          "password": "Password for your Senz WiFi account"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Senz WiFi - Reauthenticate",
+        "description": "Your Senz WiFi credentials are no longer valid. Please re-enter your password.",
+        "data": {
+          "password": "[%key:common::config_flow::data::password%]"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to Senz WiFi service",
+      "invalid_auth": "Invalid email or password",
+      "unknown": "An unexpected error occurred"
+    },
+    "abort": {
+      "already_configured": "This account is already configured",
+      "reauth_successful": "Re-authentication was successful"
+    }
+  },
+  "entity": {
+    "sensor": {
+      "comfort_temperature": {
+        "name": "Comfort temperature"
+      },
+      "vacation_temperature": {
+        "name": "Vacation temperature"
+      },
+      "frost_temperature": {
+        "name": "Frost temperature"
+      },
+      "boost_floor_temperature": {
+        "name": "Boost floor temperature"
+      },
+      "boost_room_temperature": {
+        "name": "Boost room temperature"
+      },
+      "comfort_end_time": {
+        "name": "Boost end time"
+      },
+      "error_code": {
+        "name": "Error code"
+      },
+      "software_version": {
+        "name": "Software version"
+      },
+      "selected_schedule": {
+        "name": "Selected schedule"
+      }
+    },
+    "binary_sensor": {
+      "online": {
+        "name": "Online"
+      },
+      "heating": {
+        "name": "Heating"
+      }
+    },
+    "switch": {
+      "vacation_mode": {
+        "name": "Vacation mode"
+      },
+      "frost_protection": {
+        "name": "Frost protection"
+      },
+      "early_start": {
+        "name": "Early start"
+      }
+    },
+    "select": {
+      "regulation_mode": {
+        "name": "Regulation mode"
+      },
+      "schedule_select": {
+        "name": "Schedule"
+      }
+    }
+  },
+  "services": {
+    "boost": {
+      "name": "Boost",
+      "description": "Start boost/comfort mode on a thermostat",
+      "fields": {
+        "entity_id": {
+          "name": "Entity",
+          "description": "The thermostat entity to boost"
+        },
+        "duration_minutes": {
+          "name": "Duration (minutes)",
+          "description": "Duration of the boost in minutes (default: 180)"
+        }
+      }
+    }
+  }
+}
