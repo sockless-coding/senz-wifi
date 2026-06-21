@@ -1,6 +1,7 @@
 {
   "domain": "senz_wifi",
   "name": "Senz WiFi",
+  "after_dependencies": ["http"],
   "codeowners": ["@sockless-coding"],
   "config_flow": true,
   "dependencies": [],
