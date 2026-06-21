@@ -13,6 +13,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed
+from homeassistant.helpers.httpx_client import create_async_httpx_client
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .const import DEFAULT_MAX_RETRIES, DEFAULT_TIMEOUT, DOMAIN, UPDATE_INTERVAL
@@ -54,6 +55,7 @@ class SenzWiFiCoordinator(DataUpdateCoordinator[ThermostatsResponse]):
             password=config_entry.data[CONF_PASSWORD],
             max_retries=DEFAULT_MAX_RETRIES,
             timeout=DEFAULT_TIMEOUT,
+            httpx_client=create_async_httpx_client(hass),
         )
 
         coordinator = cls(hass, config_entry, api)

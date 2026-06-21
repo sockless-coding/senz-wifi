@@ -13,6 +13,7 @@ from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
 from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
+from homeassistant.helpers.httpx_client import create_async_httpx_client
 
 from .const import (
     CONF_HEATING_POWER_WATTS,
@@ -48,6 +49,7 @@ async def validate_input(
     client = AsyncSenzWifi(
         email=data[CONF_EMAIL],
         password=data[CONF_PASSWORD],
+        httpx_client=create_async_httpx_client(hass),
     )
 
     try:
