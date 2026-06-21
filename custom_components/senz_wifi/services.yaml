@@ -5,7 +5,6 @@ boost:
       domain: climate
   fields:
     duration_minutes:
-      friendly_name: "Duration (minutes)"
       description: "Duration of the boost in minutes (default: 180)"
       selector:
         number:
