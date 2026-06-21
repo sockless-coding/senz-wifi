@@ -1,6 +1,8 @@
 # Senz WiFi Home Assistant Integration
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
+[![GitHub Release](https://img.shields.io/github/v/release/sockless-coding/senz-wifi?style=for-the-badge)](https://github.com/sockless-coding/senz-wifi/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
 A [Home Assistant](https://www.home-assistant.io/) custom integration for [Senz WiFi](https://www.senz.co.nz/) (Pentair Thermal WiFi) smart underfloor heating thermostats.
 
@@ -140,7 +142,7 @@ The heating power is configurable per thermostat via the **Heating power** numbe
 ## Requirements
 
 - Home Assistant 2024.1.0 or later
-- `senzwifi>=2026.6.1` Python package (installed automatically)
+- `senzwifi>=2026.6.2` Python package (installed automatically)
 
 ## Troubleshooting
 
