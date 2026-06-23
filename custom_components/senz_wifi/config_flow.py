@@ -9,7 +9,7 @@ import voluptuous as vol
 from senzwifi import AsyncSenzWifi
 from senzwifi.exceptions import AuthenticationError, SenzWifiError
 
-from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
+from homeassistant.config_entries import ConfigFlow, ConfigFlowResult, OptionsFlow
 from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
@@ -159,12 +159,8 @@ class InvalidAuth(HomeAssistantError):
     """Error to indicate there is invalid auth."""
 
 
-class SenzWiFiOptionsFlowHandler(ConfigFlow, domain=DOMAIN):
+class SenzWiFiOptionsFlowHandler(OptionsFlow):
     """Handle options flow for Senz WiFi."""
-
-    def __init__(self) -> None:
-        """Initialize the options flow handler."""
-        self._thermostat_info: dict[str, str] = {}
 
     async def async_step_init(
         self,
@@ -173,22 +169,23 @@ class SenzWiFiOptionsFlowHandler(ConfigFlow, domain=DOMAIN):
         """Handle the options flow step."""
         errors: dict[str, str] = {}
 
-        entry = self._get_current_entry()
+        entry = self.config_entry
 
         # Get thermostat info from runtime data
         coordinator = entry.runtime_data
+        thermostat_info: dict[str, str] = {}
         if coordinator and coordinator.data:
             all_thermostats = coordinator.data.get_all_thermostats()
-            self._thermostat_info = {
+            thermostat_info = {
                 t.serial_number: t.room for t in all_thermostats
             }
 
-        if not self._thermostat_info:
+        if not thermostat_info:
             return self.async_abort(reason="no_thermostats")
 
         # Build schema with heating power for each thermostat, using room names
         schema = {}
-        for serial, room in self._thermostat_info.items():
+        for serial, room in thermostat_info.items():
             key = f"{serial}_{CONF_HEATING_POWER_WATTS}"
             schema[
                 vol.Optional(
@@ -213,7 +210,7 @@ class SenzWiFiOptionsFlowHandler(ConfigFlow, domain=DOMAIN):
             description_placeholders={
                 "thermostats": ", ".join(
                     f"{room} ({serial})"
-                    for serial, room in self._thermostat_info.items()
+                    for serial, room in thermostat_info.items()
                 ),
             },
         )
